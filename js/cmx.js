@@ -85,6 +85,12 @@ var CMS = {
 		return target;
 	},
 
+	template: function (html) {
+		var el = document.createElement('div');
+		el.innerHTML = html;
+		return el.childNodes[1];
+	},
+
 	render: function (url) {
 		CMS.settings.mainContainer.html('').fadeOut(CMS.settings.fadeSpeed);
 		CMS.settings.footerContainer.hide();
@@ -123,13 +129,12 @@ var CMS = {
 		CMS.pages.forEach(function(page){
 			if(page.title == title) {
 
-				var tpl = $('#page-template').html(),
-					$tpl = $(tpl);
+				var tpl = CMS.template(document.getElementById('page-template').innerHTML);
 
-				$tpl.find('.page-title').html(page.title);
-				$tpl.find('.page-content').html(page.contentData);
+				tpl.childNodes[1].innerHTML = page.title;
+				tpl.childNodes[3].innerHTML = page.contentData;
 
-				CMS.settings.mainContainer.html($tpl).hide().fadeIn(CMS.settings.fadeSpeed);
+				CMS.settings.mainContainer.html(tpl).hide().fadeIn(CMS.settings.fadeSpeed);
 			}
 		});
 		CMS.renderFooter();
@@ -139,14 +144,13 @@ var CMS = {
 		CMS.posts.forEach(function(post){
 			if(post.id == id) {
 
-				var tpl = $('#post-template').html(),
-					$tpl = $(tpl);
+				var tpl = CMS.template(document.getElementById('post-template').innerHTML);
 
-				$tpl.find('.post-title').html(post.title);
-				$tpl.find('.post-date').html((post.date.getMonth() + 1) + '/' + post.date.getDate() + '/' +  post.date.getFullYear());
-				$tpl.find('.post-content').html(post.contentData);
+				tpl.childNodes[1].innerHTML = post.title;
+				tpl.childNodes[3].innerHTML = (post.date.getMonth() + 1) + '/' + post.date.getDate() + '/' +  post.date.getFullYear();
+				tpl.childNodes[5].innerHTML = post.contentData;
 
-				CMS.settings.mainContainer.html($tpl).hide().fadeIn(CMS.settings.fadeSpeed);
+				CMS.settings.mainContainer.html(tpl).hide().fadeIn(CMS.settings.fadeSpeed);
 			}
 		});
 		CMS.renderFooter();
@@ -154,8 +158,7 @@ var CMS = {
 
 	renderPosts: function() {
 		CMS.posts.forEach(function(post){
-			var tpl = $('#post-template').html(),
-				$tpl = $(tpl);
+			var tpl = CMS.template(document.getElementById('post-template').innerHTML);
 
 			var title = '<a href="#!">' + post.title + '</a>',
 				date = (post.date.getMonth() + 1) + '/' + post.date.getDate() + '/' +  post.date.getFullYear(),
@@ -173,7 +176,7 @@ var CMS = {
 			postLink.html(title);
 			postSnippet.html(snippet);
 			postDate.html(date);
-			CMS.settings.mainContainer.append($tpl).hide().fadeIn(CMS.settings.fadeSpeed);
+			CMS.settings.mainContainer.append(tpl).hide().fadeIn(CMS.settings.fadeSpeed);
 		});
 		CMS.renderFooter();
 	},
@@ -186,13 +189,14 @@ var CMS = {
 	},
 
 	renderError: function(msg) {
+		var tpl = CMS.template(document.getElementById('.error_text').innerHTML);
 		var tpl = $('#error-template').html(),
 			$tpl = $(tpl);
 
-		$tpl.find('.error_text').html(msg);
+		tpl.childNodes[3].innerHTML = msg;
 
 		CMS.settings.mainContainer.html('').fadeOut(CMS.settings.fadeSpeed, function(){
-			CMS.settings.mainContainer.html($tpl).fadeIn(CMS.settings.fadeSpeed);
+			CMS.settings.mainContainer.html(tpl).fadeIn(CMS.settings.fadeSpeed);
 		});
 	},
 
@@ -223,13 +227,14 @@ var CMS = {
 		// Get content info
 		var infoData = data[1].split('\n');
 
-		$.each(infoData, function(k, v) {
+		infoData.forEach(function (v) {
 			if(v.length) {
 				v.replace(/^\s+|\s+$/g, '').trim();
 				var i = v.split(':');
 				var val = i[1];
-				k = i[0];
-				contentObj[k] = val.trim();
+				infoData = i[0];
+				val = (infoData == 'date' ? (new Date(val)) : val);
+				contentObj[infoData] = (val.trim ? val.trim() : val);
 			}
 		});
 
@@ -419,7 +424,7 @@ var CMS = {
 			// Set brand
 			if(attribute.attr == '.cms_sitename') {
 				if (attribute.value.match(/\.(jpeg|jpg|gif|png)$/)) {
-		            value = '<img src="' + attribute.value + '" />';
+		            value = '<img src="' + attribute.valu	e + '" />';
 		        } else {
 		            value = attribute.value;
 		        }
