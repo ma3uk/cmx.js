@@ -3,10 +3,10 @@ $(function() {
   CMS.init({
 
     // Name of your site or location of logo file, relative to root directory (img/logo.png)
-    siteName: 'My Site',
+    siteName: 'CMX Github Pages Test Site',
 
     // Tagline for your site
-    siteTagline: 'Your site tagline',
+    siteTagline: 'test test test',
 
     // Email address
     siteEmail: 'your_email@example.com',
